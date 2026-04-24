@@ -1,0 +1,49 @@
+# 依赖
+node_modules/
+miniprogram/miniprogram_npm/
+
+# 环境变量（含 Token、AppSecret 等敏感信息）
+.env
+.env.local
+.env.*.local
+server/.env
+
+# 数据库文件（含用户数据）
+*.db
+*.sqlite
+*.sqlite3
+server/data.db
+
+# 上传的图片（用户内容）
+server/uploads/*
+!server/uploads/.gitkeep
+
+# 日志
+*.log
+server/server.log
+logs/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 微信开发者工具
+miniprogram/project.private.config.json
+
+# 构建产物
+dist/
+build/
+.cache/
+
+# Node 调试
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+Desktop.ini

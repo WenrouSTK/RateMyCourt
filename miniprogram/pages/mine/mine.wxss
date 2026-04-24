@@ -1,0 +1,40 @@
+.page { min-height: 100vh; }
+
+.welcome {
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+.welcome-emoji { font-size: 100rpx; margin-bottom: 20rpx; }
+.welcome-title { font-size: 36rpx; font-weight: 600; color: var(--c-text); }
+.welcome-sub { font-size: 26rpx; margin-top: 8rpx; }
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+.avatar {
+  width: 120rpx; height: 120rpx;
+  border-radius: 50%;
+  background: var(--c-bg-chip);
+  flex-shrink: 0;
+}
+.nick { font-size: 34rpx; font-weight: 600; color: var(--c-text); }
+.sm { font-size: 22rpx; }
+
+.section-title { font-size: 30rpx; font-weight: 600; margin-bottom: 16rpx; color: var(--c-text); }
+.empty-line { text-align: center; color: var(--c-text-3); padding: 40rpx 0; font-size: 26rpx; }
+
+.review-item {
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--c-separator);
+  transition: background .2s ease;
+}
+.review-item:last-child { border-bottom: none; }
+.row-hover { background: var(--c-bg-chip); border-radius: 12rpx; }
+
+.court-name-sm { font-size: 28rpx; font-weight: 600; color: var(--c-blue); }
+.content { margin-top: 10rpx; color: var(--c-text); font-size: 28rpx; line-height: 1.5; }
+
+.logout { text-align: center; }
+.logout-text { color: var(--c-red); font-size: 30rpx; font-weight: 500; }

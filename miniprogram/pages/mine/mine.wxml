@@ -1,0 +1,47 @@
+<view class="page">
+  <nav-bar title="我的" subtitle="{{user ? user.nickname : '还没登录'}}" mode="large" />
+
+  <block wx:if="{{!user}}">
+    <view class="card welcome">
+      <view class="welcome-emoji">🎾</view>
+      <view class="welcome-title">欢迎来到深网地图</view>
+      <view class="welcome-sub muted">登录后即可写点评、收藏场地</view>
+      <view class="btn-primary" style="margin-top:32rpx" bindtap="login">微信一键登录</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="card profile">
+      <image class="avatar" src="{{user.avatar || '/images/avatar.png'}}" mode="aspectFill" />
+      <view style="flex:1">
+        <view class="nick">{{user.nickname}}</view>
+        <view class="muted sm">ID: {{user.id}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">我的点评 <text class="muted sm">({{myReviews.length}})</text></view>
+      <view wx:if="{{myReviews.length === 0}}" class="empty-line">还没写过点评</view>
+      <view
+        class="review-item"
+        wx:for="{{myReviews}}" wx:key="id"
+        data-id="{{item.court_id}}" bindtap="goCourt"
+        hover-class="row-hover"
+      >
+        <view class="row-between">
+          <view class="court-name-sm">{{item.court_name}}</view>
+          <view class="stars">★ {{item.rating_overall}}</view>
+        </view>
+        <view class="content">{{item.content}}</view>
+        <view class="muted sm">{{item.created_at}}</view>
+      </view>
+    </view>
+
+    <view class="card logout" bindtap="logout">
+      <view class="logout-text">退出登录</view>
+    </view>
+  </block>
+
+  <view style="height: 220rpx"></view>
+  <tabbar active="mine" />
+</view>

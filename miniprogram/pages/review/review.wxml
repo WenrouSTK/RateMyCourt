@@ -1,0 +1,75 @@
+<view class="page">
+  <nav-bar title="写点评" mode="normal" showBack="{{true}}" />
+
+  <view class="card">
+    <view class="court-name">{{court_name}}</view>
+    <view class="row" style="margin-top:20rpx">
+      <text class="label">总评分</text>
+      <view class="stars-input">
+        <text
+          wx:for="{{[1,2,3,4,5]}}" wx:key="*this"
+          class="star {{item <= rating_overall ? 'on' : ''}}"
+          data-field="overall" data-n="{{item}}" bindtap="onStarTap"
+        >★</text>
+      </view>
+    </view>
+
+    <view wx:for="{{dims}}" wx:key="key" class="row" style="margin-top:16rpx">
+      <text class="label">{{item.name}}</text>
+      <view class="stars-input">
+        <text
+          wx:for="{{[1,2,3,4,5]}}" wx:for-item="n" wx:key="*this"
+          class="star small {{n <= item.val ? 'on' : ''}}"
+          data-field="{{item.key}}" data-n="{{n}}" bindtap="onStarTap"
+        >★</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容 -->
+  <view class="card">
+    <textarea
+      class="textarea"
+      placeholder="说说你对这个球场的感受，场地、价格、服务...（至少 5 字）"
+      value="{{content}}" bindinput="onContent"
+      maxlength="500" auto-height
+    />
+    <view class="muted small" style="text-align:right">{{content.length}}/500</view>
+  </view>
+
+  <!-- 标签选择 -->
+  <view class="card">
+    <view class="section-title">快速标签（选 1-10 个）</view>
+    <view class="tag-pool">
+      <text
+        wx:for="{{presetTags}}" wx:key="*this"
+        class="tag {{selectedTags.includes(item) ? 'on' : ''}}"
+        data-tag="{{item}}" bindtap="toggleTag"
+      >#{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 图片 -->
+  <view class="card">
+    <view class="imgs">
+      <view class="img-wrap" wx:for="{{images}}" wx:key="*this">
+        <image src="{{item}}" mode="aspectFill" class="img" />
+        <view class="img-del" data-idx="{{index}}" bindtap="removeImage">×</view>
+      </view>
+      <view class="img-add" wx:if="{{images.length < 3}}" bindtap="chooseImage">+</view>
+    </view>
+    <view class="row-between" style="margin-top:16rpx">
+      <text class="muted small">最多上传 3 张图片</text>
+      <view class="row">
+        <text class="small" style="margin-right:10rpx">是球友实拍</text>
+        <switch checked="{{is_real_shot}}" bindchange="toggleRealShot" color="#0d6efd" style="transform:scale(0.8)" />
+      </view>
+    </view>
+  </view>
+
+  <view style="padding:30rpx">
+    <view class="btn-primary {{submitting ? 'disabled' : ''}}" bindtap="submit">
+      {{submitting ? '提交中...' : '发布点评'}}
+    </view>
+  </view>
+</view>

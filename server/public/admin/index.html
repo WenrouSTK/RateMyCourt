@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>深网地图 · 管理后台</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; background: #f5f5f7; color: #222; }
+  header { background: #0d6efd; color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 16px; }
+  header h1 { margin: 0; font-size: 18px; }
+  header .token { margin-left: auto; font-size: 12px; opacity: .9; }
+  header .token input { padding: 4px 8px; border: none; border-radius: 4px; width: 220px; }
+  .tabs { display: flex; background: #fff; border-bottom: 1px solid #e5e5ea; }
+  .tabs button { padding: 12px 20px; border: none; background: transparent; cursor: pointer; font-size: 14px; }
+  .tabs button.active { color: #0d6efd; border-bottom: 2px solid #0d6efd; font-weight: 600; }
+  main { padding: 20px; max-width: 1280px; margin: 0 auto; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  h2 { margin: 0 0 16px; font-size: 16px; }
+  h3 { margin: 16px 0 10px; font-size: 14px; color: #555; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+  th { background: #fafafa; font-weight: 600; }
+  .btn { padding: 6px 12px; border: 1px solid #0d6efd; background: #fff; color: #0d6efd; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 6px; }
+  .btn-primary { background: #0d6efd; color: #fff; }
+  .btn-danger { border-color: #dc3545; color: #dc3545; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  form.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  form.grid label { display: flex; flex-direction: column; font-size: 12px; color: #666; }
+  form.grid input, form.grid select, form.grid textarea { padding: 8px; border: 1px solid #d1d1d6; border-radius: 4px; font-size: 14px; margin-top: 4px; font-family: inherit; }
+  form.grid textarea { min-height: 60px; }
+  form.grid .full { grid-column: 1 / -1; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+  .tag-green { background: #d4edda; color: #155724; }
+  .tag-yellow { background: #fff3cd; color: #856404; }
+  .tag-red { background: #f8d7da; color: #721c24; }
+  .stars { color: #fa0; }
+  .msg { position: fixed; top: 20px; right: 20px; padding: 10px 16px; border-radius: 4px; background: #28a745; color: #fff; display: none; z-index: 100; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .chip {
+    padding: 4px 12px; border-radius: 16px; font-size: 12px;
+    background: #f0f0f3; color: #666; cursor: pointer; user-select: none;
+    border: 1px solid #e5e5ea;
+  }
+  .chip.on { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .dyn-row { display: flex; gap: 6px; margin-bottom: 6px; }
+  .dyn-row input, .dyn-row select { flex: 1; padding: 6px; border: 1px solid #d1d1d6; border-radius: 4px; font-size: 13px; }
+  .dyn-row button { border: none; background: #dc3545; color: #fff; border-radius: 4px; cursor: pointer; width: 32px; }
+  .muted { color: #999; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎾 深网地图 · 管理后台</h1>
+  <div class="token">
+    Token: <input id="admin-token" placeholder="x-admin-token" />
+    <button class="btn" style="background:#fff" onclick="saveToken()">保存</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-pane="pane-courts">场馆管理</button>
+  <button class="tab-btn" data-pane="pane-add">新增 / 编辑</button>
+  <button class="tab-btn" data-pane="pane-reviews">评论审核</button>
+  <button class="tab-btn" data-pane="pane-corrections">纠错反馈</button>
+</div>
+
+<main>
+  <!-- 场馆列表 -->
+  <div class="pane active" id="pane-courts">
+    <div class="card">
+      <h2>场馆列表</h2>
+      <button class="btn btn-primary" onclick="loadCourts()">刷新</button>
+      <table id="courts-table">
+        <thead>
+          <tr><th>ID</th><th>名称</th><th>区</th><th>地址</th><th>类型</th><th>均分</th><th>评论</th><th>状态</th><th>操作</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 新增 / 编辑 -->
+  <div class="pane" id="pane-add">
+    <div class="card">
+      <h2>新增 / 编辑场馆</h2>
+      <form class="grid" id="court-form">
+        <input type="hidden" name="id" />
+        <label>名称 *<input name="name" required /></label>
+        <label>区<select name="district">
+          <option value="">-</option>
+          <option>福田</option><option>南山</option><option>罗湖</option>
+          <option>宝安</option><option>龙岗</option><option>龙华</option>
+          <option>坪山</option><option>盐田</option><option>光明</option><option>大鹏</option>
+        </select></label>
+        <label>电话<input name="phone" /></label>
+        <label class="full">地址<input name="address" /></label>
+        <label>经度 lng<input name="lng" type="number" step="0.0000001" /></label>
+        <label>纬度 lat<input name="lat" type="number" step="0.0000001" /></label>
+        <label class="full">真实封面图 URL<input name="cover_image_real" placeholder="优先用真实场景，不要宣传图" /></label>
+
+        <!-- 场地类型 多选 -->
+        <div class="full">
+          <div class="muted">场地类型（可多选）</div>
+          <div class="chips" data-field="court_types">
+            <span class="chip" data-v="hard">🎾 硬地</span>
+            <span class="chip" data-v="clay">🟫 红土</span>
+            <span class="chip" data-v="grass">🌱 草地</span>
+            <span class="chip" data-v="indoor_practice">🏠 室内练习</span>
+          </div>
+        </div>
+
+        <!-- 环境标签 多选 -->
+        <div class="full">
+          <div class="muted">环境标签（可多选）</div>
+          <div class="chips" data-field="env_tags">
+            <span class="chip" data-v="露天">☀️ 露天</span>
+            <span class="chip" data-v="风雨">☂️ 风雨</span>
+            <span class="chip" data-v="空调">❄️ 空调</span>
+          </div>
+        </div>
+
+        <!-- 便利性 多选 -->
+        <div class="full">
+          <div class="muted">便利性（可多选）</div>
+          <div class="chips" data-field="facility_tags">
+            <span class="chip" data-v="parking">🅿️ 停车</span>
+            <span class="chip" data-v="metro">🚇 地铁</span>
+            <span class="chip" data-v="shower">🚿 洗澡</span>
+            <span class="chip" data-v="stringing">🎾 穿线</span>
+          </div>
+        </div>
+
+        <label class="full">地铁信息<input name="metro_info" placeholder="如：2/11号线 后海站 E 出口步行 10 分钟" /></label>
+        <label class="full">停车/到达攻略<textarea name="parking_tip" placeholder="老司机指引：怎么停车、哪个门、几楼..."></textarea></label>
+
+        <!-- 场地规格（动态行） -->
+        <div class="full">
+          <div class="muted">场地规格（每行一种）</div>
+          <div id="specs-box"></div>
+          <button type="button" class="btn btn-sm" onclick="addSpec()">+ 添加规格</button>
+        </div>
+
+        <!-- 价格阶梯 -->
+        <div class="full">
+          <div class="muted">价格阶梯（元/小时）</div>
+          <div id="prices-box"></div>
+          <button type="button" class="btn btn-sm" onclick="addPrice()">+ 添加价格阶梯</button>
+        </div>
+
+        <div class="full">
+          <button class="btn btn-primary" type="submit">保存</button>
+          <button class="btn" type="button" onclick="resetForm()">清空</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 评论审核 -->
+  <div class="pane" id="pane-reviews">
+    <div class="card">
+      <h2>评论列表</h2>
+      <button class="btn btn-primary" onclick="loadReviews()">刷新</button>
+      <table id="reviews-table">
+        <thead>
+          <tr><th>ID</th><th>场馆</th><th>用户</th><th>评分</th><th>标签</th><th>内容</th><th>状态</th><th>操作</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 纠错反馈 -->
+  <div class="pane" id="pane-corrections">
+    <div class="card">
+      <h2>纠错反馈</h2>
+      <button class="btn btn-primary" onclick="loadCorrections()">刷新</button>
+      <table id="corr-table">
+        <thead>
+          <tr><th>ID</th><th>场馆</th><th>用户</th><th>问题类型</th><th>详情</th><th>时间</th><th>状态</th><th>操作</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div class="msg" id="msg"></div>
+
+<script>
+const API = '';
+const FIELD_LABEL = { phone: '电话', price: '价格', hours: '营业时间', address: '地址', closed: '已关闭', other: '其他' };
+
+// ========== Token ==========
+function saveToken() { localStorage.setItem('admin_token', document.getElementById('admin-token').value.trim()); toast('已保存'); }
+function getToken() { return localStorage.getItem('admin_token') || ''; }
+document.getElementById('admin-token').value = getToken();
+
+// ========== Tab ==========
+document.querySelectorAll('.tab-btn').forEach((btn) => {
+  btn.onclick = () => {
+    document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.pane').forEach((p) => p.classList.remove('active'));
+    document.getElementById(btn.dataset.pane).classList.add('active');
+    if (btn.dataset.pane === 'pane-courts') loadCourts();
+    if (btn.dataset.pane === 'pane-reviews') loadReviews();
+    if (btn.dataset.pane === 'pane-corrections') loadCorrections();
+  };
+});
+
+// ========== Chip 多选 ==========
+document.querySelectorAll('.chips').forEach((group) => {
+  group.onclick = (e) => {
+    if (e.target.classList.contains('chip')) e.target.classList.toggle('on');
+  };
+});
+function readChips(field) {
+  const g = document.querySelector('.chips[data-field="' + field + '"]');
+  return Array.from(g.querySelectorAll('.chip.on')).map((c) => c.dataset.v);
+}
+function writeChips(field, values) {
+  const g = document.querySelector('.chips[data-field="' + field + '"]');
+  g.querySelectorAll('.chip').forEach((c) => c.classList.toggle('on', (values || []).includes(c.dataset.v)));
+}
+
+// ========== 动态行：specs / prices ==========
+function addSpec(data = { type: '', count: '', condition: '' }) {
+  const box = document.getElementById('specs-box');
+  const row = document.createElement('div');
+  row.className = 'dyn-row spec';
+  row.innerHTML =
+    '<input placeholder="类型，如 室外硬地" data-k="type" value="' + esc(data.type) + '"/>' +
+    '<input placeholder="数量" type="number" data-k="count" value="' + esc(data.count) + '" style="max-width:100px"/>' +
+    '<select data-k="condition"><option value="">新旧</option>' +
+      ['新','较新','一般','旧'].map((x) => '<option ' + (data.condition === x ? 'selected' : '') + '>' + x + '</option>').join('') +
+    '</select>' +
+    '<button type="button" onclick="this.parentElement.remove()">×</button>';
+  box.appendChild(row);
+}
+function addPrice(data = { scene: '', price: '' }) {
+  const box = document.getElementById('prices-box');
+  const row = document.createElement('div');
+  row.className = 'dyn-row price';
+  row.innerHTML =
+    '<select data-k="scene"><option value="">时段</option>' +
+      ['工作日白场','工作日晚场','周末白场','周末晚场','周末节假日','会员价'].map((x) => '<option ' + (data.scene === x ? 'selected' : '') + '>' + x + '</option>').join('') +
+    '</select>' +
+    '<input placeholder="价格(元/时)" type="number" data-k="price" value="' + esc(data.price) + '" style="max-width:140px"/>' +
+    '<button type="button" onclick="this.parentElement.remove()">×</button>';
+  box.appendChild(row);
+}
+function readDynRows(selector) {
+  return Array.from(document.querySelectorAll('#' + selector + ' .dyn-row')).map((r) => {
+    const o = {};
+    r.querySelectorAll('[data-k]').forEach((el) => {
+      let v = el.value;
+      if (el.type === 'number') v = v === '' ? null : Number(v);
+      o[el.dataset.k] = v;
+    });
+    return o;
+  }).filter((o) => Object.values(o).some((v) => v !== '' && v != null));
+}
+
+// ========== 请求 ==========
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', 'x-admin-token': getToken(), ...(opts.headers || {}) };
+  const r = await fetch(API + path, { ...opts, headers });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+function toast(text, ok = true) {
+  const m = document.getElementById('msg');
+  m.textContent = text; m.style.background = ok ? '#28a745' : '#dc3545'; m.style.display = 'block';
+  setTimeout(() => m.style.display = 'none', 2000);
+}
+function esc(s) { return String(s ?? '').replace(/"/g, '&quot;'); }
+function escHtml(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+// ========== 场馆 ==========
+const TYPE_LABEL = { hard: '🎾硬地', clay: '🟫红土', grass: '🌱草地', indoor_practice: '🏠室内' };
+
+async function loadCourts() {
+  try {
+    const { list } = await api('/api/courts?sort=new');
+    document.querySelector('#courts-table tbody').innerHTML = list.map((c) => '' +
+      '<tr>' +
+      '<td>' + c.id + '</td>' +
+      '<td>' + escHtml(c.name) + '</td>' +
+      '<td>' + escHtml(c.district || '-') + '</td>' +
+      '<td>' + escHtml(c.address || '-') + '</td>' +
+      '<td>' + ((c.court_types || []).map((t) => TYPE_LABEL[t] || t).join(' ') || '-') + '</td>' +
+      '<td class="stars">★' + (c.avg_rating || 0) + '</td>' +
+      '<td>' + (c.review_count || 0) + '</td>' +
+      '<td>' + (c.status == 1 ? '<span class="tag tag-green">上架</span>' : '<span class="tag tag-red">下架</span>') + '</td>' +
+      '<td>' +
+        '<button class="btn" onclick=\'editCourt(' + JSON.stringify(c) + ')\'>编辑</button>' +
+        '<button class="btn btn-danger" onclick="delCourt(' + c.id + ')">下架</button>' +
+      '</td></tr>').join('');
+  } catch (e) { toast(e.message, false); }
+}
+
+function editCourt(c) {
+  document.querySelector('.tab-btn[data-pane="pane-add"]').click();
+  resetForm();
+  const form = document.getElementById('court-form');
+  ['id','name','district','address','lat','lng','phone','cover_image_real','metro_info','parking_tip'].forEach((k) => {
+    if (form.elements[k]) form.elements[k].value = c[k] ?? '';
+  });
+  writeChips('court_types', c.court_types);
+  writeChips('env_tags', c.env_tags);
+  writeChips('facility_tags', c.facility_tags);
+  (c.specs || []).forEach(addSpec);
+  (c.price_tiers || []).forEach(addPrice);
+}
+
+async function delCourt(id) {
+  if (!confirm('确认下架？')) return;
+  try { await api('/api/courts/' + id, { method: 'DELETE' }); toast('已下架'); loadCourts(); }
+  catch (e) { toast(e.message, false); }
+}
+
+function resetForm() {
+  document.getElementById('court-form').reset();
+  document.getElementById('court-form').elements.id.value = '';
+  document.querySelectorAll('.chip.on').forEach((c) => c.classList.remove('on'));
+  document.getElementById('specs-box').innerHTML = '';
+  document.getElementById('prices-box').innerHTML = '';
+}
+
+document.getElementById('court-form').onsubmit = async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const body = {};
+  for (const el of form.elements) {
+    if (el.name && el.value !== '' && el.type !== 'button' && el.type !== 'submit') {
+      body[el.name] = ['lat','lng'].includes(el.name) ? Number(el.value) : el.value;
+    }
+  }
+  body.court_types = readChips('court_types');
+  body.env_tags = readChips('env_tags');
+  body.facility_tags = readChips('facility_tags');
+  body.specs = readDynRows('specs-box');
+  body.price_tiers = readDynRows('prices-box');
+  const id = body.id; delete body.id;
+  try {
+    if (id) await api('/api/courts/' + id, { method: 'PUT', body: JSON.stringify(body) });
+    else await api('/api/courts', { method: 'POST', body: JSON.stringify(body) });
+    toast('保存成功'); resetForm(); loadCourts();
+    document.querySelector('.tab-btn[data-pane="pane-courts"]').click();
+  } catch (e) { toast(e.message, false); }
+};
+
+// ========== 评论 ==========
+async function loadReviews() {
+  try {
+    const { list } = await api('/api/reviews/admin/all');
+    const statusTag = (s) => s == 0 ? '<span class="tag tag-yellow">待审</span>' : s == 1 ? '<span class="tag tag-green">通过</span>' : '<span class="tag tag-red">拒绝</span>';
+    document.querySelector('#reviews-table tbody').innerHTML = list.map((r) => '' +
+      '<tr>' +
+      '<td>' + r.id + '</td>' +
+      '<td>' + escHtml(r.court_name || '-') + '</td>' +
+      '<td>' + escHtml(r.user_nickname || '-') + '</td>' +
+      '<td class="stars">' + '★'.repeat(r.rating_overall || 0) + '</td>' +
+      '<td>' + ((r.tags || []).map((t) => '#' + t).join(' ') || '-') + '</td>' +
+      '<td style="max-width:300px">' + escHtml(r.content || '') + '</td>' +
+      '<td>' + statusTag(r.status) + '</td>' +
+      '<td>' +
+        (r.status != 1 ? '<button class="btn btn-primary btn-sm" onclick="audit(' + r.id + ',\'approve\')">通过</button>' : '') +
+        (r.status != 2 ? '<button class="btn btn-danger btn-sm" onclick="audit(' + r.id + ',\'reject\')">拒绝</button>' : '') +
+      '</td></tr>').join('');
+  } catch (e) { toast(e.message, false); }
+}
+async function audit(id, action) {
+  try { await api('/api/reviews/' + id + '/audit', { method: 'POST', body: JSON.stringify({ action }) }); toast('操作成功'); loadReviews(); }
+  catch (e) { toast(e.message, false); }
+}
+
+// ========== 纠错 ==========
+async function loadCorrections() {
+  try {
+    const { list } = await api('/api/corrections');
+    const statusTag = (s) => s == 0 ? '<span class="tag tag-yellow">待处理</span>' : s == 1 ? '<span class="tag tag-green">已处理</span>' : '<span class="tag">已忽略</span>';
+    document.querySelector('#corr-table tbody').innerHTML = list.map((c) => '' +
+      '<tr>' +
+      '<td>' + c.id + '</td>' +
+      '<td>' + escHtml(c.court_name || '-') + '</td>' +
+      '<td>' + escHtml(c.user_nickname || '匿名') + '</td>' +
+      '<td>' + (FIELD_LABEL[c.field] || c.field) + '</td>' +
+      '<td style="max-width:400px">' + escHtml(c.content || '') + '</td>' +
+      '<td class="muted">' + escHtml(c.created_at) + '</td>' +
+      '<td>' + statusTag(c.status) + '</td>' +
+      '<td>' +
+        (c.status != 1 ? '<button class="btn btn-primary btn-sm" onclick="corrStatus(' + c.id + ',1)">已处理</button>' : '') +
+        (c.status != 2 ? '<button class="btn btn-sm" onclick="corrStatus(' + c.id + ',2)">忽略</button>' : '') +
+      '</td></tr>').join('');
+  } catch (e) { toast(e.message, false); }
+}
+async function corrStatus(id, status) {
+  try { await api('/api/corrections/' + id + '/status', { method: 'POST', body: JSON.stringify({ status }) }); toast('OK'); loadCorrections(); }
+  catch (e) { toast(e.message, false); }
+}
+
+// 初始化
+loadCourts();
+</script>
+</body>
+</html>

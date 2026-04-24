@@ -1,0 +1,165 @@
+<view class="page" wx:if="{{court}}">
+  <nav-bar title="{{court.name}}" mode="normal" showBack="{{true}}" />
+
+  <!-- 顶部图集 -->
+  <view class="gallery" wx:if="{{imagesFiltered.length > 0}}">
+    <scroll-view scroll-x class="gallery-scroll">
+      <image
+        wx:for="{{imagesFiltered}}" wx:key="url"
+        src="{{item.url}}" mode="aspectFill" class="gallery-img"
+        data-urls="{{imagesFiltered}}" data-current="{{item.url}}"
+        bindtap="previewImage"
+      />
+    </scroll-view>
+    <view class="image-tabs">
+      <text class="img-tab {{imageTab === 'all' ? 'on' : ''}}" data-tab="all" bindtap="onImageTab">全部</text>
+      <text class="img-tab {{imageTab === 'real' ? 'on' : ''}}" data-tab="real" bindtap="onImageTab">📷 球友实拍</text>
+      <text class="img-tab {{imageTab === 'official' ? 'on' : ''}}" data-tab="official" bindtap="onImageTab">官方图</text>
+    </view>
+  </view>
+
+  <!-- 头部信息 -->
+  <view class="header">
+    <view class="name">{{court.name}}</view>
+    <view class="muted small">📍 {{court.district}} · {{court.address}}</view>
+
+    <view class="row" style="margin-top:16rpx">
+      <view class="stars big">★ {{court.avg_rating}}</view>
+      <view class="muted" style="margin-left:16rpx">{{court.review_count}} 条评价</view>
+    </view>
+
+    <!-- 标签群 -->
+    <view class="tag-row">
+      <text class="tag tag-type" wx:for="{{court.type_items}}" wx:for-item="t" wx:key="label" style="color:{{t.color}};border-color:{{t.color}}">
+        {{t.icon}} {{t.label}}
+      </text>
+      <text class="tag" wx:if="{{court.env_icons}}">{{court.env_icons}}</text>
+      <text class="tag tag-fac" wx:for="{{court.facility_items}}" wx:for-item="f" wx:key="label">
+        {{f.icon}} {{f.label}}
+      </text>
+    </view>
+
+    <!-- 操作条 -->
+    <view class="row actions">
+      <view class="action" bindtap="openLocation">📍 一键导航</view>
+      <view class="action" bindtap="callPhone" wx:if="{{court.phone}}">📞 打电话</view>
+      <view class="action" bindtap="showCorrection">⚠️ 纠错</view>
+    </view>
+  </view>
+
+  <!-- 维度均分 -->
+  <view class="card" wx:if="{{reviews.length > 0}}">
+    <view class="section-title">分项评分</view>
+    <view class="dims">
+      <view class="dim" wx:for="{{dims}}" wx:key="key">
+        <view class="dim-name">{{item.name}}</view>
+        <view class="dim-score">{{court.dim_avg[item.key] || '-'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 场地规格 -->
+  <view class="card" wx:if="{{court.specs && court.specs.length > 0}}">
+    <view class="section-title">场地规格</view>
+    <view class="spec-total muted">
+      共 {{court.specs.reduce ? '' : ''}}
+      <text>{{court.total_specs}}</text>
+    </view>
+    <view class="spec-table">
+      <view class="spec-row" wx:for="{{court.specs}}" wx:key="type">
+        <text class="spec-type">{{item.type}}</text>
+        <text class="spec-count">× {{item.count}}</text>
+        <text class="spec-cond {{item.condition === '新' ? 'new' : item.condition === '旧' ? 'old' : ''}}">{{item.condition || ''}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 价格阶梯 -->
+  <view class="card" wx:if="{{court.price_tiers && court.price_tiers.length > 0}}">
+    <view class="section-title">价格阶梯（元/小时）</view>
+    <view class="price-table">
+      <view class="price-row" wx:for="{{court.price_tiers}}" wx:key="scene">
+        <text class="price-scene">{{item.scene}}</text>
+        <text class="price-val">¥{{item.price}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 到达攻略 -->
+  <view class="card" wx:if="{{court.parking_tip || court.metro_info}}">
+    <view class="section-title">到达攻略</view>
+    <view wx:if="{{court.metro_info}}" class="tip-line">
+      <text class="tip-icon">🚇</text>
+      <text class="tip-text">{{court.metro_info}}</text>
+    </view>
+    <view wx:if="{{court.parking_tip}}" class="tip-line">
+      <text class="tip-icon">🅿️</text>
+      <text class="tip-text">{{court.parking_tip}}</text>
+    </view>
+  </view>
+
+  <!-- 热门标签 -->
+  <view class="card" wx:if="{{court.hot_tags && court.hot_tags.length > 0}}">
+    <view class="section-title">球友都说</view>
+    <view class="hot-tags">
+      <text class="hot-tag" wx:for="{{court.hot_tags}}" wx:key="name">
+        #{{item.name}} <text class="muted small">{{item.count}}</text>
+      </text>
+    </view>
+  </view>
+
+  <!-- 评论列表 -->
+  <view class="card">
+    <view class="section-title">球友点评（{{reviews.length}}）</view>
+    <view wx:if="{{reviews.length === 0}}" class="empty">还没有人评论，快来抢个沙发～</view>
+    <view class="review" wx:for="{{reviews}}" wx:key="id">
+      <view class="row-between">
+        <view class="row">
+          <image class="avatar" src="{{item.user_avatar || '/images/avatar.png'}}" mode="aspectFill" />
+          <view class="nickname">{{item.user_nickname}}</view>
+        </view>
+        <view class="stars">★ {{item.rating_overall}}</view>
+      </view>
+      <view class="r-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+        <text class="r-tag" wx:for="{{item.tags}}" wx:for-item="t" wx:key="*this">#{{t}}</text>
+      </view>
+      <view class="content">{{item.content}}</view>
+      <view class="imgs" wx:if="{{item.images && item.images.length}}">
+        <image
+          wx:for="{{item.images}}" wx:for-item="img" wx:key="*this"
+          src="{{img}}" mode="aspectFill" class="review-img"
+          data-urls="{{item.images}}" data-current="{{img}}"
+          bindtap="previewImage"
+        />
+      </view>
+      <view class="muted small">{{item.created_at}}</view>
+    </view>
+  </view>
+
+  <view style="height: 140rpx"></view>
+</view>
+
+<!-- 底部写评价 -->
+<view class="footer-bar">
+  <view class="btn-primary" bindtap="goReview">✍️ 写点评</view>
+</view>
+
+<!-- 纠错弹窗 -->
+<view class="mask" wx:if="{{correctionVisible}}" bindtap="hideCorrection">
+  <view class="modal" catchtap="">
+    <view class="modal-title">纠错反馈</view>
+    <view class="modal-sub muted small">这个场馆哪里信息不对？告诉我们，马上核实</view>
+    <view class="c-fields">
+      <text
+        class="c-field {{correctionField === f.key ? 'on' : ''}}"
+        wx:for="{{correctionFields}}" wx:for-item="f" wx:key="key"
+        data-key="{{f.key}}" bindtap="onCorrectionField"
+      >{{f.label}}</text>
+    </view>
+    <textarea class="c-input" placeholder="说说具体情况（至少 3 字）" value="{{correctionContent}}" bindinput="onCorrectionInput" maxlength="200" />
+    <view class="row" style="margin-top:24rpx; gap:20rpx">
+      <view class="btn-ghost" bindtap="hideCorrection">取消</view>
+      <view class="btn-primary" style="flex:1" bindtap="submitCorrection">提交</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/court/court",
+    "pages/review/review",
+    "pages/mine/mine"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColor": "#000000",
+    "backgroundTextStyle": "light"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "usingComponents": {
+    "tabbar": "/components/tabbar/tabbar",
+    "nav-bar": "/components/nav-bar/nav-bar"
+  }
+}

@@ -1,0 +1,97 @@
+/* ================================
+ * 深网地图 - 全局主题（Apple HIG · 深色锁定）
+ * ================================ */
+page {
+  /* iOS 系统深色模式色板 */
+  --c-bg:            #000000;
+  --c-bg-elev:       #1C1C1E;  /* elevated surface / card */
+  --c-bg-elev-2:     #2C2C2E;  /* secondarySystemBackground */
+  --c-bg-chip:       #2C2C2E;
+  --c-bg-chip-2:     #3A3A3C;
+  --c-text:          #FFFFFF;
+  --c-text-2:        rgba(235,235,245,.60);
+  --c-text-3:        rgba(235,235,245,.30);
+  --c-separator:     rgba(84,84,88,.50);
+
+  /* iOS 系统色（深色版） */
+  --c-blue:          #0A84FF;
+  --c-orange:        #FF9F0A;
+  --c-red:           #FF453A;
+  --c-green:         #30D158;
+  --c-yellow:        #FFD60A;
+  --c-purple:        #BF5AF2;
+
+  --c-tabbar-bg:     rgba(28,28,30,.72);
+  --c-shadow:        0 4rpx 20rpx rgba(0,0,0,.45);
+  --c-shadow-sm:     0 2rpx 8rpx rgba(0,0,0,.35);
+
+  background: var(--c-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+               "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  color: var(--c-text);
+  font-size: 30rpx;
+  letter-spacing: -0.1rpx;
+}
+
+/* 通用工具 */
+.row { display: flex; align-items: center; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.col { display: flex; flex-direction: column; }
+.muted { color: var(--c-text-3); }
+.muted-2 { color: var(--c-text-2); }
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 卡片 */
+.card {
+  background: var(--c-bg-elev);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  margin: 16rpx 24rpx;
+  box-shadow: var(--c-shadow-sm);
+}
+
+/* 主按钮（胶囊） */
+.btn-primary {
+  height: 96rpx;
+  line-height: 96rpx;
+  background: var(--c-blue);
+  color: #fff;
+  border-radius: 999rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  letter-spacing: 0.2rpx;
+  box-shadow: 0 4rpx 16rpx rgba(10,132,255,.3);
+}
+.btn-primary.disabled { opacity: .5; box-shadow: none; }
+
+/* 幽灵按钮 */
+.btn-ghost {
+  height: 96rpx;
+  line-height: 96rpx;
+  padding: 0 40rpx;
+  background: var(--c-bg-chip);
+  color: var(--c-text);
+  border-radius: 999rpx;
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+/* 星级 */
+.stars { color: var(--c-orange); font-weight: 600; }
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  background: var(--c-bg-chip);
+  color: var(--c-text-2);
+  line-height: 1.5;
+}

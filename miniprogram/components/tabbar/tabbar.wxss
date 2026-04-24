@@ -1,0 +1,44 @@
+.tabbar-wrap {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(24rpx + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 99;
+}
+.tabbar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx;
+  background: var(--c-tabbar-bg);
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  border-radius: 999rpx;
+  box-shadow:
+    0 4rpx 24rpx rgba(0,0,0,.12),
+    0 0 0 1rpx rgba(255,255,255,.25) inset;
+}
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 18rpx 36rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  color: var(--c-text-2);
+  transition: all .25s ease;
+}
+.tab-icon { font-size: 32rpx; }
+.tab-label { font-weight: 500; }
+.tab.on {
+  background: var(--c-blue);
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0,122,255,.35);
+}
+.tab.on .tab-label { font-weight: 600; }
+
+/* 给页面底部预留空间 */
+/* 页面 WXML 末尾放一个 height: 180rpx 的占位 view */

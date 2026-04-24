@@ -1,0 +1,15 @@
+<view class="nav-wrap" style="padding-top: {{statusBarHeight}}px;">
+  <!-- 小导航条：仅返回/普通模式标题 -->
+  <view class="nav-bar" style="height: {{navBarHeight}}px;">
+    <view class="back" wx:if="{{showBack}}" bindtap="goBack">
+      <text class="chev">‹</text>
+    </view>
+    <view class="nav-title" wx:if="{{mode === 'normal'}}">{{title}}</view>
+  </view>
+
+  <!-- 大标题（HIG Large Title） -->
+  <view class="large-title" wx:if="{{mode === 'large'}}">
+    <view class="lt-main">{{title}}</view>
+    <view class="lt-sub" wx:if="{{subtitle}}">{{subtitle}}</view>
+  </view>
+</view>

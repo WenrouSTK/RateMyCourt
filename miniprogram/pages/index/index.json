@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "tabbar": "/components/tabbar/tabbar",
+    "nav-bar": "/components/nav-bar/nav-bar"
+  }
+}

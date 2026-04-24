@@ -1,0 +1,96 @@
+<view class="page">
+  <nav-bar title="深网地图" subtitle="深圳球友的场地百科全书" mode="large" />
+
+  <!-- 胶囊搜索 + 区筛选 -->
+  <view class="search-wrap">
+    <view class="search-pill">
+      <text class="s-icon">🔍</text>
+      <input
+        class="s-input" placeholder="搜索球场名称"
+        value="{{keyword}}" bindinput="onKeyword"
+        confirm-type="search" bindconfirm="onSearch"
+      />
+      <picker mode="selector" range="{{districts}}" value="{{districtIndex}}" bindchange="onDistrictChange">
+        <view class="s-picker">{{district || '全部区'}} ▾</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 分段排序 -->
+  <view class="segment">
+    <view
+      class="seg-item {{sort === 'distance' ? 'on' : ''}}"
+      data-sort="distance" bindtap="onSortTap"
+    >离我最近</view>
+    <view
+      class="seg-item {{sort === 'rating' ? 'on' : ''}}"
+      data-sort="rating" bindtap="onSortTap"
+    >评分优先</view>
+    <view
+      class="seg-item {{sort === 'new' ? 'on' : ''}}"
+      data-sort="new" bindtap="onSortTap"
+    >最新收录</view>
+  </view>
+
+  <!-- 列表 -->
+  <view wx:if="{{list.length === 0 && !loading}}" class="empty">暂无球场</view>
+
+  <view class="list">
+    <view
+      class="court-card"
+      wx:for="{{list}}" wx:key="id"
+      data-id="{{item.id}}" bindtap="goCourt"
+      hover-class="card-hover" hover-stay-time="120"
+    >
+      <!-- 左侧缩略图（HIG 圆角 22） -->
+      <view class="thumb-wrap">
+        <image
+          wx:if="{{item.cover}}"
+          class="thumb" src="{{item.cover}}" mode="aspectFill" lazy-load="true"
+        />
+        <view wx:else class="thumb thumb-placeholder">🎾</view>
+      </view>
+
+      <!-- 右侧信息 -->
+      <view class="info">
+        <view class="row-between">
+          <view class="court-name ellipsis">{{item.name}}</view>
+          <view class="distance" wx:if="{{item.distance_text}}">{{item.distance_text}}</view>
+        </view>
+
+        <view class="row meta">
+          <text class="stars">★ {{item.avg_rating}}</text>
+          <text class="muted sm"> · {{item.review_count}} 条评价 · {{item.district}}</text>
+        </view>
+
+        <!-- 硬核标签 -->
+        <view class="tag-row">
+          <text
+            class="tag tag-type"
+            wx:for="{{item.type_items}}" wx:for-item="t" wx:key="label"
+            style="color:{{t.color}};border-color:{{t.color}}33;background:{{t.color}}10;"
+          >{{t.icon}} {{t.label}}</text>
+          <text class="tag" wx:if="{{item.env_icons}}">{{item.env_icons}}</text>
+          <text
+            class="tag tag-fac"
+            wx:for="{{item.facility_items}}" wx:for-item="f" wx:key="label"
+          >{{f.icon}}</text>
+        </view>
+
+        <view class="row-between foot">
+          <view wx:if="{{item.price_from}}">
+            <text class="price-num">¥{{item.price_from}}</text>
+            <text class="muted sm"> 起/时</text>
+          </view>
+          <view wx:else></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部留白 -->
+  <view style="height: 220rpx"></view>
+
+  <!-- 悬浮胶囊 Tab Bar -->
+  <tabbar active="home" />
+</view>

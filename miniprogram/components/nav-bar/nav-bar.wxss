@@ -1,0 +1,42 @@
+.nav-wrap {
+  background: transparent;
+}
+.nav-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+}
+.back {
+  width: 64rpx; height: 64rpx;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(60,60,67,.6);
+  border-radius: 50%;
+  backdrop-filter: blur(20rpx);
+}
+.chev { font-size: 48rpx; color: #FFFFFF; line-height: 1; margin-top: -6rpx; }
+.nav-title {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+/* HIG Large Title */
+.large-title {
+  padding: 16rpx 32rpx 20rpx;
+}
+.lt-main {
+  font-size: 68rpx;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.8rpx;
+  color: var(--c-text);
+}
+.lt-sub {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: var(--c-text-3);
+}
